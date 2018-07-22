@@ -1,6 +1,6 @@
 # PropensityToBuy
 Model built using sklearn which predicts probability of purchasing financial given input the bank transactions of users
-## Different Approachs Used
+### Different Approachs Used
 ```
     
     * Data type check
@@ -17,7 +17,7 @@ Model built using sklearn which predicts probability of purchasing financial giv
 
 ![alt text](images/NN.png "Description goes here")
 
-## Charecteristic of the NN model:
+### Charecteristic of the NN model:
 
 - Optimizer : Stochastic Gradient Descent(For training Examples > 1000 it converges faster)
 - Activation function : Logistic (sigmoid).
@@ -29,7 +29,7 @@ Model built using sklearn which predicts probability of purchasing financial giv
 
 ![alt text](images/ada.png "Description goes here")
 
-## Charecteristic of the AdaBoost model:
+### Charecteristic of the AdaBoost model:
 
 - Optimizer : Stochastic Gradient Descent (For training examples > 1000 it converges faster).
 - Cost Function : Logistic Cost Function.
