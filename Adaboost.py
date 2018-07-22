@@ -1,25 +1,6 @@
-
-# coding: utf-8
-
-# In[51]:
-
+#Adaboost model 
 
 import pandas as pd
-#data prepared using clubbingintoquators.py
-data=pd.read_csv('mf_fin.csv')
-data.shape
-
-
-# In[52]:
-
-
-for i in data.columns:
-    print(i)
-
-
-# In[53]:
-
-
 from sklearn.metrics import classification_report,confusion_matrix,accuracy_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier,AdaBoostClassifier
@@ -29,6 +10,11 @@ from sklearn.feature_selection import SelectKBest,chi2,mutual_info_classif
 from sklearn.decomposition import PCA
 from sklearn.utils import resample
 from sklearn.tree import DecisionTreeClassifier
+
+#data prepared using clubbingintoquators.py
+data=pd.read_csv('mf_fin.csv')
+data.shape
+
 def model(X_train,X_test,y_train,y_test):
     adb = AdaBoostClassifier(n_estimators=100,learning_rate=0.01,random_state=123)
     scaler = StandardScaler()
@@ -55,15 +41,9 @@ def model(X_train,X_test,y_train,y_test):
     print(classification_report(y_train,pred_train))
     print(accuracy_score(pred_train,y_train))
     return adb,X_test,y_test,p_values,scores
-
-
-# In[54]:
-
-
+#upsampling the data
 df_majority = data[data.res==0]
 df_minority = data[data.res==1]
-print(df_majority.shape)
-print(df_minority.shape)
 df_minority_train=df_minority[:81]
 df_minority_ups_train = resample(df_minority_train, 
                                 replace=True,     # sample with replacement
@@ -71,8 +51,6 @@ df_minority_ups_train = resample(df_minority_train,
                                  random_state=123)
 df_train=pd.concat([df_majority[:4648],df_minority_ups_train])
 df_test=pd.concat([df_majority[4648:],df_minority[81:]])
-print(df_train.shape)
-print(df_test.shape)
 
 X_train=df_train.drop(['res','ACC_ID','AMT_INTEREST_Q4'],axis=1)
 columns=df_train.drop(['res','ACC_ID','AMT_INTEREST_Q4'],axis=1).columns
@@ -81,18 +59,8 @@ X_test=df_test.drop(['res','ACC_ID','AMT_INTEREST_Q4'],axis=1)
 user_id_test=df_test['ACC_ID']
 y_train=df_train['res']
 y_test=df_test['res']
-print(X_train.shape)
 
-
-# In[55]:
-
-
-X_train.shape
-
-
-# In[56]:
-
-
+#Feature selection using mutual information
 test = SelectKBest(score_func=mutual_info_classif,k=50)
 fit = test.fit(X_train.as_matrix(),y_train.as_matrix())
 p_values=test.pvalues_
@@ -100,54 +68,12 @@ scores=test.scores_
 X_train = fit.transform(X_train.as_matrix())
 X_test=fit.transform(X_test.as_matrix())
 
-
-# In[57]:
-
-
-adb,X_test,y_test,p_values,scores=model(X_train,X_test,y_train.as_matrix(),y_test.as_matrix())
-
-
-# In[58]:
-
-
-# from sklearn.externals import joblib
-# joblib.dump(rfc,'ada_1_33.pkl')
-
-
-# In[59]:
-
-
-class_0=[]
-class_1=[]
-c=0
-for i in adb.predict_proba(X_test):
-    class_0.append(i[0])
-    class_1.append(i[1])
-
-
-# In[60]:
-
-
-# pd.DataFrame({'user_id':user_id_test,'Prob_class0':class_0,'Prob_class1':class_1,'actual':y_test,'pred':adb.predict(X_test)}).to_csv("adb_analysis.csv")
-
-
-# In[61]:
-
-
-pred_train=adb.predict(X_train)
-print(confusion_matrix(y_train,pred_train))
-
-
-# In[62]:
-
-
+#get to know the selected featues
 for i,j in zip(columns,fit.get_support()):
     if j==True:
         print(i)
 
+#train the model and get test
+adb,X_test,y_test,p_values,scores=model(X_train,X_test,y_train.as_matrix(),y_test.as_matrix())
 
-# In[63]:
-
-
-len(fit.get_support())
 
